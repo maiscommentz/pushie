@@ -216,17 +216,15 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 						margin-bottom: -10px;
 					}
 					
-					/* Visibilité des différents SVG */
+					/* SVG Visibility */
 					.ghost-svg, .tombstone-svg {
 						display: none;
 						width: 100%;
 						height: 100%;
-					}
+					}	
 					.ghost-svg.active, .tombstone-svg.active {
 						display: block;
 					}
-					
-
 					
 					.refresh-btn {
 						margin-top: 15px;
@@ -422,7 +420,6 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 				<p class="info-text">Commits this week: <span id="commit-count">Loading...</span></p>
 				<div style="display:flex; gap: 10px; margin-top: 15px;">
 					<button class="refresh-btn" style="margin-top: 0;" id="refresh-btn">🔄 Refresh</button>
-					<button class="refresh-btn" style="margin-top: 0; background-color: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground);" id="debug-btn">🐛 Debug</button>
 				</div>
 
 				<script>
@@ -450,27 +447,27 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 								progressBar.style.backgroundColor = '#424242'; // Grey
 								document.getElementById('svg-dead').classList.add('active');
 								container.classList.add('anim-dead');
-								bubble.textContent = "J'ai fondu d'ennui... 💀";
+								bubble.textContent = "I melted from boredom... 💀";
 							} else if (percentage < 30) {
 								progressBar.style.backgroundColor = '#F44336'; // Red
 								document.getElementById('svg-sad').classList.add('active');
 								container.classList.add('anim-sad');
-								bubble.textContent = "Commit s'il te plaît... J'ai faim ! 😭";
+								bubble.textContent = "Commit please... I'm hungry! 😭";
 							} else if (percentage < 50) {
 								progressBar.style.backgroundColor = '#FFC107'; // Yellow
 								document.getElementById('svg-neutral').classList.add('active');
 								container.classList.add('anim-neutral');
-								bubble.textContent = "Un petit push me ferait du bien... 😐";
+								bubble.textContent = "A little push would do me good... 😐";
 							} else if (percentage < 80) {
 								progressBar.style.backgroundColor = '#29B6F6'; // Light Blue
 								document.getElementById('svg-good').classList.add('active');
 								container.classList.add('anim-happy');
-								bubble.textContent = "Beau travail ! Je suis en pleine forme ! ✨";
+								bubble.textContent = "Great job! I'm in tip-top shape! ✨";
 							} else {
 								progressBar.style.backgroundColor = '#00E676'; // Bright Green
 								document.getElementById('svg-epic').classList.add('active');
 								container.classList.add('anim-epic');
-								bubble.textContent = "Quel code magnifique, on va devenir riche ensemble ! 💸😎";
+								bubble.textContent = "What magnificent code, I feel more alive than ever! 💸😎";
 							}
 						}
 					});
@@ -481,13 +478,6 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 						bubble.textContent = "Checking GitHub...";
 						const vscode = acquireVsCodeApi();
 						vscode.postMessage({ type: 'refresh' });
-					});
-
-					let debugVisuelIndex = 0;
-					const debugValues = [0, 2, 4, 7, 10]; // 0%, 20%, 40%, 70%, 100%
-					document.getElementById('debug-btn').addEventListener('click', () => {
-						debugVisuelIndex = (debugVisuelIndex + 1) % debugValues.length;
-						window.postMessage({ type: 'updateCommitCount', value: debugValues[debugVisuelIndex] });
 					});
 				</script>
 			</body>
