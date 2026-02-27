@@ -9,7 +9,7 @@ Meet **pushie**, your cute little coding buddy who lives right inside your VS Co
 ![VS Code Ext](https://img.shields.io/badge/VS_Code_API-0065A9?style=for-the-badge&logo=visual-studio-code&logoColor=white)
 
 ## ✨ Features
-- **Dynamic Pixel Art:** Pushie evolves into 5 different states based on your weekly commits!
+- **Dynamic Pixel Art:** pushie evolves into 5 different states based on your weekly commits!
 - **Interactive Personality:** Each state has its own unique animation, color, and voice line. 
 - **Weekly Tracker:** Connected directly to your GitHub profile metrics to track your real commits across all branches.
 - **Persistent Buddy:** He stays alive and retains his state even when you close the extension sidebar.
@@ -18,7 +18,7 @@ Meet **pushie**, your cute little coding buddy who lives right inside your VS Co
 
 1. Open VS Code.
 2. Go to the **Extensions** view (`Ctrl+Shift+X` or `Cmd+Shift+X`).
-3. Search for "Pushie" (once published) or install the VSIX file locally.
+3. Search for "pushie" (once published) or install the VSIX file locally.
 4. Click on the cute **Slime Icon** in your Activity Bar.
-5. Pushie will request access to your GitHub account to read your commit activity. **Allow** it!
-6. Start coding, pushing your commits, and watch Pushie evolve throughout the week!
+5. pushie will request access to your GitHub account to read your commit activity. **Allow** it!
+6. Start coding, pushing your commits, and watch pushie evolve throughout the week!

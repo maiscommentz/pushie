@@ -36,7 +36,27 @@
         "command": "pushie.helloWorld",
         "title": "Hello World"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "pushie",
+      "properties": {
+        "pushie.openaiApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "OpenAI API Key to let pushie roast your code. You can also use keys from free providers like Groq or OpenRouter if you change the Base URL."
+        },
+        "pushie.apiBaseUrl": {
+          "type": "string",
+          "default": "https://api.openai.com/v1/chat/completions",
+          "description": "The API endpoint for OpenAI-compatible services. Change this to use free APIs like Groq (https://api.groq.com/openai/v1/chat/completions) or local LM Studio (http://localhost:1234/v1/chat/completions)."
+        },
+        "pushie.apiModel": {
+          "type": "string",
+          "default": "gpt-4o-mini",
+          "description": "The model to use. E.g., 'gpt-4o-mini' for OpenAI, 'llama3-8b-8192' for Groq, or 'local-model' for LM Studio."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

@@ -27,6 +27,8 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 		webviewView.webview.onDidReceiveMessage(message => {
 			if (message.type === 'refresh') {
 				this._updateCommitCount(webviewView.webview);
+			} else if (message.type === 'roastMe') {
+				this._handleRoastRequest(webviewView.webview);
 			}
 		});
 
@@ -79,7 +81,80 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 			}
 		} catch (error) {
 			console.error('Error fetching GitHub data:', error);
-			vscode.window.showErrorMessage('Failed to fetch GitHub commits for Pushie.');
+			vscode.window.showErrorMessage('Failed to fetch GitHub commits for pushie.');
+		}
+	}
+
+	private async _handleRoastRequest(webview: vscode.Webview) {
+		const editor = vscode.window.activeTextEditor;
+		if (!editor) {
+			webview.postMessage({ type: 'showRoast', value: "No active editor? What am I supposed to roast, the air?" });
+			return;
+		}
+
+		const selection = editor.selection;
+		const selectedText = editor.document.getText(selection);
+
+		if (!selectedText.trim()) {
+			webview.postMessage({ type: 'showRoast', value: "Select some code first genius." });
+			return;
+		}
+
+		const config = vscode.workspace.getConfiguration('pushie');
+		const apiKey = config.get<string>('openaiApiKey');
+		const apiUrl = config.get<string>('apiBaseUrl') || 'https://api.openai.com/v1/chat/completions';
+		let apiModel = config.get<string>('apiModel') || 'gpt-4o-mini';
+
+		if (!apiKey && apiUrl.includes('openai.com')) {
+			webview.postMessage({ type: 'showRoast', value: "No API key? I refuse to work for free." });
+			vscode.window.showErrorMessage('Please set your API Key in the pushie extension settings (pushie.openaiApiKey) to unlock roasts.');
+			return;
+		}
+
+		webview.postMessage({ type: 'showRoast', value: "Judging your code... Hmm..." });
+
+		try {
+			const prompt = `You are pushie, a sarcastic, elitist, and slightly passive-aggressive pixel-art monster living in VS Code. Your only goal is to judge the code the human selects.
+Rules:
+- Tone: Bored, superior Tamagotchi.
+- Be mocking for complex/messy code, and fake-impressed for simple code.
+- NEVER give sincere compliments.
+- Constraint: Max 15 words per response.
+- Use dev slang (e.g., 'spaghetti', 'legacy', 'O(n^2)', 'Junior', 'boilerplate', etc.).
+- Language: English.
+
+Here is the snippet the human dared to show me:
+${selectedText}
+
+pushie, give me your brutal 15-word verdict.`;
+
+			const response = await fetch(apiUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					...(apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {})
+				},
+				body: JSON.stringify({
+					model: apiModel,
+					messages: [{ role: 'user', content: prompt }],
+					max_tokens: 50
+				})
+			});
+
+			if (!response.ok) {
+				const errorBody = await response.text();
+				console.error(`Error roasting code (HTTP ${response.status}):`, errorBody);
+				webview.postMessage({ type: 'showRoast', value: `API Error ${response.status}. Check developer console. 😢` });
+				return;
+			}
+
+			const data = await response.json() as any;
+			const roast = data?.choices?.[0]?.message?.content || "Words fail me. It's that bad.";
+
+			webview.postMessage({ type: 'showRoast', value: roast });
+		} catch (error) {
+			console.error('Error roasting code:', error);
+			webview.postMessage({ type: 'showRoast', value: "My connection dropped trying to read your spaghetti." });
 		}
 	}
 
@@ -420,9 +495,12 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 				<p class="info-text">Commits this week: <span id="commit-count">Loading...</span></p>
 				<div style="display:flex; gap: 10px; margin-top: 15px;">
 					<button class="refresh-btn" style="margin-top: 0;" id="refresh-btn">🔄 Refresh</button>
+					<button class="refresh-btn" style="margin-top: 0; background-color: #f0c996ff; color: white;" id="roast-btn">🔥 Roast my code</button>
 				</div>
 
 				<script>
+					const vscode = acquireVsCodeApi();
+
 					window.addEventListener('message', event => {
 						const message = event.data;
 						if (message.type === 'updateCommitCount') {
@@ -469,6 +547,10 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 								container.classList.add('anim-epic');
 								bubble.textContent = "What magnificent code, I feel more alive than ever! 💸😎";
 							}
+						} else if (message.type === 'showRoast') {
+							const bubble = document.getElementById('speech-bubble');
+							bubble.style.opacity = '1';
+							bubble.textContent = message.value;
 						}
 					});
 
@@ -476,8 +558,13 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 						const bubble = document.getElementById('speech-bubble');
 						document.getElementById('commit-count').textContent = 'Loading...';
 						bubble.textContent = "Checking GitHub...";
-						const vscode = acquireVsCodeApi();
 						vscode.postMessage({ type: 'refresh' });
+					});
+
+					document.getElementById('roast-btn').addEventListener('click', () => {
+						const bubble = document.getElementById('speech-bubble');
+						bubble.textContent = "Summoning judgment...";
+						vscode.postMessage({ type: 'roastMe' });
 					});
 				</script>
 			</body>
