@@ -480,7 +480,7 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 							document.getElementById('commit-count').textContent = commitCount.toString();
 							
 							// Each commit gives 8% food
-							const percentage = Math.min(100, commitCount * 9);
+							const percentage = Math.min(100, commitCount * 8);
 							const progressBar = document.querySelector('.progress-bar');
 							const container = document.getElementById('avatar-container');
 							const bubble = document.getElementById('speech-bubble');
