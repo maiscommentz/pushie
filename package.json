@@ -3,6 +3,7 @@
   "displayName": "pushie",
   "description": "Meet pushie, the virtual pet living in your repositories. Keep him alive by pushing code, watch him evolve with your PRs, and get roasted by his AI for messy commit messages. ",
   "version": "0.0.1",
+  "icon": "media/icon.png",
   "engines": {
     "vscode": "^1.109.0"
   },
@@ -12,6 +13,24 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "pushie-explorer",
+          "title": "pushie",
+          "icon": "media/pushie-activity.svg"
+        }
+      ]
+    },
+    "views": {
+      "pushie-explorer": [
+        {
+          "type": "webview",
+          "id": "pushie.dashboard",
+          "name": "dashboard"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "pushie.helloWorld",
@@ -34,15 +53,18 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.109.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
-    "typescript-eslint": "^8.54.0",
-    "eslint": "^9.39.2",
+    "@types/vscode": "^1.109.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
     "esbuild": "^0.27.2",
+    "eslint": "^9.39.2",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.9.3",
-    "@vscode/test-cli": "^0.0.12",
-    "@vscode/test-electron": "^2.5.2"
+    "typescript-eslint": "^8.54.0"
+  },
+  "dependencies": {
+    "octokit": "^5.0.5"
   }
 }

@@ -1,71 +1,24 @@
-# pushie README
+# pushie
 
-This is the README for your extension "pushie". After writing up a brief description, we recommend including the following sections.
+Meet **pushie**, your cute little coding buddy who lives right inside your VS Code Editor! He loves to see you commit things and is here to cheer you on and keep you motivated on your coding journey. If you don't commit frequently in a week, pushie will start melting, get sad, and might even leave you !
 
-## Features
+## 🛠️ Technologies
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
+![CSS](https://img.shields.io/badge/css-663399.svg?style=for-the-badge&logo=css&logoColor=white)
+![VS Code Ext](https://img.shields.io/badge/VS_Code_API-0065A9?style=for-the-badge&logo=visual-studio-code&logoColor=white)
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+## ✨ Features
+- **Dynamic Pixel Art:** Pushie evolves into 5 different states based on your weekly commits!
+- **Interactive Personality:** Each state has its own unique animation, color, and voice line. 
+- **Weekly Tracker:** Connected directly to your GitHub profile metrics to track your real commits across all branches.
+- **Persistent Buddy:** He stays alive and retains his state even when you close the extension sidebar.
 
-For example if there is an image subfolder under your extension project workspace:
+## 🚀 Installation & Usage
 
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+1. Open VS Code.
+2. Go to the **Extensions** view (`Ctrl+Shift+X` or `Cmd+Shift+X`).
+3. Search for "Pushie" (once published) or install the VSIX file locally.
+4. Click on the cute **Slime Icon** in your Activity Bar.
+5. Pushie will request access to your GitHub account to read your commit activity. **Allow** it!
+6. Start coding, pushing your commits, and watch Pushie evolve throughout the week!
