@@ -11,6 +11,10 @@
     "Other"
   ],
   "activationEvents": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maiscommentz/pushie.git"
+  },
   "main": "./dist/extension.js",
   "contributes": {
     "viewsContainers": {
@@ -40,15 +44,19 @@
     "configuration": {
       "title": "pushie",
       "properties": {
+        "pushie.aiProvider": {
+          "type": "string",
+          "enum": [
+            "OpenAI",
+            "Groq"
+          ],
+          "default": "OpenAI",
+          "description": "Select your AI Provider."
+        },
         "pushie.openaiApiKey": {
           "type": "string",
           "default": "",
-          "description": "OpenAI API Key to let pushie roast your code. You can also use keys from free providers like Groq or OpenRouter if you change the Base URL."
-        },
-        "pushie.apiBaseUrl": {
-          "type": "string",
-          "default": "https://api.openai.com/v1/chat/completions",
-          "description": "The API endpoint for OpenAI-compatible services. Change this to use free APIs like Groq (https://api.groq.com/openai/v1/chat/completions) or local LM Studio (http://localhost:1234/v1/chat/completions)."
+          "description": "API Key for your selected AI Provider."
         },
         "pushie.apiModel": {
           "type": "string",
