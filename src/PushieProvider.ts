@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { AIProviderFactory } from './AIProvider';
 
 
 export class PushieProvider implements vscode.WebviewViewProvider {
@@ -27,6 +28,8 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 		webviewView.webview.onDidReceiveMessage(message => {
 			if (message.type === 'refresh') {
 				this._updateCommitCount(webviewView.webview);
+			} else if (message.type === 'roastMe') {
+				this._handleRoastRequest(webviewView.webview);
 			}
 		});
 
@@ -79,7 +82,51 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 			}
 		} catch (error) {
 			console.error('Error fetching GitHub data:', error);
-			vscode.window.showErrorMessage('Failed to fetch GitHub commits for Pushie.');
+			vscode.window.showErrorMessage('Failed to fetch GitHub commits for pushie.');
+		}
+	}
+
+	private async _handleRoastRequest(webview: vscode.Webview) {
+		const editor = vscode.window.activeTextEditor;
+		if (!editor) {
+			webview.postMessage({ type: 'showRoast', value: "No active editor? What am I supposed to roast, the air?" });
+			return;
+		}
+
+		const selection = editor.selection;
+		const selectedText = editor.document.getText(selection);
+
+		if (!selectedText.trim()) {
+			webview.postMessage({ type: 'showRoast', value: "Select some code first genius." });
+			return;
+		}
+
+		const config = vscode.workspace.getConfiguration('pushie');
+		const providerName = config.get<string>('aiProvider') || 'OpenAI';
+		const apiKey = config.get<string>('openaiApiKey');
+		let apiModel = config.get<string>('apiModel') || 'gpt-4o-mini';
+
+		if (!apiKey) {
+			webview.postMessage({ type: 'showRoast', value: "No API key? I refuse to work for free." });
+			vscode.window.showErrorMessage('Please set your API Key in the pushie extension settings (pushie.openaiApiKey) to unlock roasts.');
+			return;
+		}
+
+		webview.postMessage({ type: 'showRoast', value: "Judging your code... Hmm..." });
+
+		try {
+			const provider = AIProviderFactory.getProvider(providerName);
+			const roast = await provider.roastCode({
+				selectedText,
+				apiKey: apiKey || '',
+				apiModel
+			});
+
+			webview.postMessage({ type: 'showRoast', value: roast });
+		} catch (error: any) {
+			console.error('Error roasting code:', error);
+			const errorMsg = error.message || "My connection dropped trying to read your spaghetti.";
+			webview.postMessage({ type: 'showRoast', value: `${errorMsg} 😢` });
 		}
 	}
 
@@ -419,18 +466,21 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 				</div>
 				<p class="info-text">Commits this week: <span id="commit-count">Loading...</span></p>
 				<div style="display:flex; gap: 10px; margin-top: 15px;">
-					<button class="refresh-btn" style="margin-top: 0;" id="refresh-btn">🔄 Refresh</button>
+					<button class="refresh-btn" style="margin-top: 0; background-color: #3e404cff; color: white;" id="refresh-btn">🔄 Refresh</button>
+					<button class="refresh-btn" style="margin-top: 0; background-color: #4c463eff; color: white;" id="roast-btn">🔥 Roast my code</button>
 				</div>
 
 				<script>
+					const vscode = acquireVsCodeApi();
+
 					window.addEventListener('message', event => {
 						const message = event.data;
 						if (message.type === 'updateCommitCount') {
 							const commitCount = message.value;
 							document.getElementById('commit-count').textContent = commitCount.toString();
 							
-							// Each commit gives 10% food
-							const percentage = Math.min(100, commitCount * 10);
+							// Each commit gives 8% food
+							const percentage = Math.min(100, commitCount * 8);
 							const progressBar = document.querySelector('.progress-bar');
 							const container = document.getElementById('avatar-container');
 							const bubble = document.getElementById('speech-bubble');
@@ -467,8 +517,12 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 								progressBar.style.backgroundColor = '#00E676'; // Bright Green
 								document.getElementById('svg-epic').classList.add('active');
 								container.classList.add('anim-epic');
-								bubble.textContent = "What magnificent code, I feel more alive than ever! 💸😎";
+								bubble.textContent = "So much commits, I feel more alive than ever! 💸😎";
 							}
+						} else if (message.type === 'showRoast') {
+							const bubble = document.getElementById('speech-bubble');
+							bubble.style.opacity = '1';
+							bubble.textContent = message.value;
 						}
 					});
 
@@ -476,8 +530,13 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 						const bubble = document.getElementById('speech-bubble');
 						document.getElementById('commit-count').textContent = 'Loading...';
 						bubble.textContent = "Checking GitHub...";
-						const vscode = acquireVsCodeApi();
 						vscode.postMessage({ type: 'refresh' });
+					});
+
+					document.getElementById('roast-btn').addEventListener('click', () => {
+						const bubble = document.getElementById('speech-bubble');
+						bubble.textContent = "Summoning judgment...";
+						vscode.postMessage({ type: 'roastMe' });
 					});
 				</script>
 			</body>
