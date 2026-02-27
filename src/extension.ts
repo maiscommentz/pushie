@@ -15,7 +15,11 @@ export function activate(context: vscode.ExtensionContext) {
 	const provider = new PushieProvider(context.extensionUri);
 
 	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(PushieProvider.viewType, provider)
+		vscode.window.registerWebviewViewProvider(
+			PushieProvider.viewType,
+			provider,
+			{ webviewOptions: { retainContextWhenHidden: true } }
+		)
 	);
 
 	// The command has been defined in the package.json file
