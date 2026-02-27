@@ -24,6 +24,12 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 
 		webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
+		webviewView.webview.onDidReceiveMessage(message => {
+			if (message.type === 'refresh') {
+				this._updateCommitCount(webviewView.webview);
+			}
+		});
+
 		this._updateCommitCount(webviewView.webview);
 	}
 
@@ -37,24 +43,36 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 
 				const { data: user } = await octokit.rest.users.getAuthenticated();
 
-				const yesterday = new Date();
-				yesterday.setDate(yesterday.getDate() - 1);
+				// Get the start and end of the current local week (Monday start) in UTC for the query
+				const startOfWeek = new Date();
+				const day = startOfWeek.getDay() || 7; // Convert Sunday (0) to 7
+				startOfWeek.setDate(startOfWeek.getDate() - (day - 1));
+				startOfWeek.setHours(0, 0, 0, 0);
 
-				// Fetch events from the last 24h
-				const { data: events } = await octokit.rest.activity.listEventsForAuthenticatedUser({
-					username: user.login,
-					per_page: 100
-				});
+				const endOfWeek = new Date();
+				endOfWeek.setHours(23, 59, 59, 999);
 
-				let commitCount = 0;
-				for (const event of events) {
-					if (event.type === 'PushEvent' && event.created_at) {
-						const eventDate = new Date(event.created_at);
-						if (eventDate > yesterday) {
-							commitCount += (event.payload as any).commits?.length || 0;
+				const query = `
+					query($login: String!, $from: DateTime!, $to: DateTime!) {
+						user(login: $login) {
+							contributionsCollection(from: $from, to: $to) {
+								totalCommitContributions
+								restrictedContributionsCount
+							}
 						}
 					}
-				}
+				`;
+
+				const result: any = await octokit.graphql(query, {
+					login: user.login,
+					from: startOfWeek.toISOString(),
+					to: endOfWeek.toISOString()
+				});
+
+				const collection = result.user.contributionsCollection;
+				// restrictedContributionsCount covers private commits if the token has the right scope
+				let commitCount = collection.totalCommitContributions + (collection.restrictedContributionsCount || 0);
+
 
 				// Send count to the webview
 				webview.postMessage({ type: 'updateCommitCount', value: commitCount });
@@ -87,22 +105,71 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 					.ghost-container {
 						width: 150px;
 						height: 150px;
-						animation: float 3s ease-in-out infinite;
+						transform-origin: bottom center;
 					}
-					@keyframes float {
-						0% {
-							transform: translateY(0px);
-						}
-						50% {
-							transform: translateY(-20px);
-						}
-						100% {
-							transform: translateY(0px);
-						}
+					@keyframes slime-squish {
+						0% { transform: scale(1, 1) translateY(0); }
+						15% { transform: scale(1.1, 0.9) translateY(10px); }
+						30% { transform: scale(0.9, 1.1) translateY(-10px); }
+						45% { transform: scale(1.05, 0.95) translateY(4px); }
+						60% { transform: scale(1, 1) translateY(0); }
+						100% { transform: scale(1, 1) translateY(0); }
 					}
+					@keyframes slime-squish-slow {
+						0% { transform: scale(1, 1) translateY(0); }
+						20% { transform: scale(1.05, 0.95) translateY(5px); }
+						40% { transform: scale(0.98, 1.02) translateY(-2px); }
+						60% { transform: scale(1, 1) translateY(0); }
+						100% { transform: scale(1, 1) translateY(0); }
+					}
+					@keyframes slime-shake {
+						0% { transform: translateX(0); }
+						5% { transform: translateX(-5px); }
+						10% { transform: translateX(5px); }
+						15% { transform: translateX(-5px); }
+						20% { transform: translateX(0); }
+						100% { transform: translateX(0); }
+					}
+					.anim-happy { animation: slime-squish 2s ease-in-out infinite; }
+					.anim-epic { animation: slime-epic-levitate 3s ease-in-out infinite; filter: drop-shadow(0px 0px 8px rgba(0,230,118,0.8)); }
+					@keyframes slime-epic-levitate {
+						0% { transform: translateY(-5px); }
+						50% { transform: translateY(-20px); }
+						100% { transform: translateY(-5px); }
+					}
+					.anim-neutral { animation: slime-squish-slow 3s ease-in-out infinite; }
+					.anim-sad { animation: slime-shake 2.5s ease-in-out infinite; }
+					.anim-dead { animation: none; transform: translateY(40px) scale(1, 0.8); }
+
+					/* Parts Animations */
+					@keyframes anim-blink {
+						0%, 94%, 98%, 100% { transform: scaleY(1); }
+						96% { transform: scaleY(0.1); }
+					}
+					.part-blink { animation: anim-blink 4s infinite; }
+
+					@keyframes anim-mouth-wobble {
+						0%, 100% { transform: scaleX(1); }
+						50% { transform: scaleX(0.7); }
+					}
+					.part-mouth { animation: anim-mouth-wobble 2s ease-in-out infinite; }
+
+					@keyframes anim-sparkle {
+						0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+						50% { opacity: 0.5; transform: scale(0.5) rotate(45deg); }
+					}
+					.part-sparkle { animation: anim-sparkle 2s ease-in-out infinite; }
+					.part-sparkle-delayed { animation: anim-sparkle 2s ease-in-out infinite 1s; }
+
+					@keyframes anim-sweat {
+						0%, 100% { transform: translateY(0); opacity: 1; }
+						50% { transform: translateY(1.5px); opacity: 0.6; }
+					}
+					.part-sweat { animation: anim-sweat 1.5s ease-in-out infinite; }
+
 					.progress-container {
 						width: 80%;
-						background-color: var(--vscode-progressBar-background);
+						background-color: #424242;
 						border-radius: 10px;
 						margin-top: 20px;
 						height: 15px;
@@ -159,67 +226,204 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 						display: block;
 					}
 					
-					/* Stop the animation if it's the tombstone */
-					.ghost-container.dead {
-						animation: none;
+
+					
+					.refresh-btn {
+						margin-top: 15px;
+						padding: 4px 12px;
+						background-color: var(--vscode-button-background);
+						color: var(--vscode-button-foreground);
+						border: none;
+						border-radius: 4px;
+						cursor: pointer;
+						font-family: inherit;
+						font-size: 0.9em;
+					}
+					.refresh-btn:hover {
+						background-color: var(--vscode-button-hoverBackground);
 					}
 				</style>
 			</head>
 			<body>
 				<div class="speech-bubble" id="speech-bubble">...</div>
 				<div class="ghost-container" id="avatar-container">
-					<!-- Normal Ghost -->
-					<svg id="svg-normal" class="ghost-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-						<path d="M 50,150 L 50,80 Q 50,20 100,20 Q 150,20 150,80 L 150,150 L 130,130 L 110,150 L 90,130 L 70,150 Z" 
-							fill="#eeeeee" stroke="#333333" stroke-width="2"/>
-						<!-- Happy eyes -->
-						<path d="M 75,70 Q 85,60 95,70" fill="none" stroke="#333333" stroke-width="3" stroke-linecap="round"/>
-						<path d="M 105,70 Q 115,60 125,70" fill="none" stroke="#333333" stroke-width="3" stroke-linecap="round"/>
-						<!-- Happy mouth -->
-						<path d="M 90,100 Q 100,115 110,100" fill="none" stroke="#333333" stroke-width="3" stroke-linecap="round"/>
+					<!-- Epic Pixel Slime (1M Dollar) -->
+					<svg id="svg-epic" class="ghost-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+						<!-- Base Body -->
+						<rect x="5" y="4" width="6" height="1" fill="#00E676"/>
+						<rect x="3" y="5" width="10" height="1" fill="#00E676"/>
+						<rect x="2" y="6" width="12" height="1" fill="#00E676"/>
+						<rect x="1" y="7" width="14" height="5" fill="#00E676"/>
+						
+						<!-- Shadows (Bottom part) -->
+						<rect x="1" y="12" width="14" height="1" fill="#00C853"/>
+						<rect x="2" y="13" width="12" height="1" fill="#00C853"/>
+						<rect x="4" y="14" width="8" height="1" fill="#00C853"/>
+
+						<!-- Highlights -->
+						<rect x="4" y="5" width="3" height="1" fill="#69F0AE"/>
+						<rect x="3" y="6" width="2" height="1" fill="#69F0AE"/>
+						<rect x="2" y="7" width="1" height="2" fill="#69F0AE"/>
+
+						<!-- Deal With It Sunglasses -->
+						<g class="part-blink" style="transform-origin: center; transform-box: fill-box;">
+							<rect x="2" y="7" width="12" height="1" fill="#111111"/>
+							<rect x="3" y="8" width="4" height="2" fill="#111111"/>
+							<rect x="9" y="8" width="4" height="2" fill="#111111"/>
+							<rect x="7" y="8" width="2" height="1" fill="#111111"/>
+							<!-- Reflections -->
+							<rect x="5" y="8" width="1" height="1" fill="#FFF"/>
+							<rect x="4" y="9" width="1" height="1" fill="#FFF"/>
+							<rect x="11" y="8" width="1" height="1" fill="#FFF"/>
+							<rect x="10" y="9" width="1" height="1" fill="#FFF"/>
+						</g>
+						
+						<!-- Confident Smirk -->
+						<g class="part-mouth" style="transform-origin: center; transform-box: fill-box;">
+							<rect x="7" y="11" width="3" height="1" fill="#111"/>
+							<rect x="10" y="10" width="1" height="1" fill="#111"/>
+						</g>
+
+						<!-- Bling / Sparkle 1 -->
+						<g class="part-sparkle" style="transform-origin: center; transform-box: fill-box;">
+							<rect x="2" y="2" width="1" height="1" fill="#FFF59D"/>
+							<rect x="2" y="1" width="1" height="1" fill="#FFF176"/>
+							<rect x="2" y="3" width="1" height="1" fill="#FFF176"/>
+							<rect x="1" y="2" width="1" height="1" fill="#FFF176"/>
+							<rect x="3" y="2" width="1" height="1" fill="#FFF176"/>
+						</g>
+
+						<!-- Bling / Sparkle 2 -->
+						<g class="part-sparkle-delayed" style="transform-origin: center; transform-box: fill-box;">
+							<rect x="13" y="11" width="1" height="1" fill="#FFF59D"/>
+							<rect x="13" y="10" width="1" height="1" fill="#FFF176"/>
+							<rect x="13" y="12" width="1" height="1" fill="#FFF176"/>
+							<rect x="12" y="11" width="1" height="1" fill="#FFF176"/>
+							<rect x="14" y="11" width="1" height="1" fill="#FFF176"/>
+						</g>
 					</svg>
 
-					<!-- Neutral Ghost -->
-					<svg id="svg-neutral" class="ghost-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-						<path d="M 50,150 L 50,80 Q 50,20 100,20 Q 150,20 150,80 L 150,150 L 130,130 L 110,150 L 90,130 L 70,150 Z" 
-							fill="#eeeeee" stroke="#333333" stroke-width="2"/>
-						<circle cx="85" cy="70" r="10" fill="#333333"/>
-						<circle cx="115" cy="70" r="10" fill="#333333"/>
-						<line x1="90" y1="100" x2="110" y2="100" stroke="#333333" stroke-width="3" stroke-linecap="round"/>
+					<!-- Good Pixel Slime (Normal Happy) -->
+					<svg id="svg-good" class="ghost-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+						<!-- Base Body -->
+						<rect x="5" y="4" width="6" height="1" fill="#29B6F6"/>
+						<rect x="3" y="5" width="10" height="1" fill="#29B6F6"/>
+						<rect x="2" y="6" width="12" height="1" fill="#29B6F6"/>
+						<rect x="1" y="7" width="14" height="5" fill="#29B6F6"/>
+						
+						<!-- Shadows (Bottom part) -->
+						<rect x="1" y="12" width="14" height="1" fill="#0288D1"/>
+						<rect x="2" y="13" width="12" height="1" fill="#0288D1"/>
+						<rect x="4" y="14" width="8" height="1" fill="#0288D1"/>
+
+						<!-- Highlights -->
+						<rect x="4" y="5" width="3" height="1" fill="#81D4FA"/>
+						<rect x="3" y="6" width="2" height="1" fill="#81D4FA"/>
+						<rect x="2" y="7" width="1" height="2" fill="#81D4FA"/>
+
+						<!-- Happy Eyes -->
+						<g class="part-blink" style="transform-origin: center; transform-box: fill-box;">
+							<rect x="4" y="9" width="1" height="2" fill="#111"/>
+							<rect x="11" y="9" width="1" height="2" fill="#111"/>
+						</g>
+						
+						<!-- Cute Smile -->
+						<g class="part-mouth" style="transform-origin: center; transform-box: fill-box;">
+							<rect x="6" y="11" width="1" height="1" fill="#111"/>
+							<rect x="9" y="11" width="1" height="1" fill="#111"/>
+							<rect x="7" y="12" width="2" height="1" fill="#111"/>
+						</g>
 					</svg>
 
-					<!-- Sad/Hungry Ghost -->
-					<svg id="svg-sad" class="ghost-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-						<path d="M 50,150 L 50,80 Q 50,20 100,20 Q 150,20 150,80 L 150,150 L 130,130 L 110,150 L 90,130 L 70,150 Z" 
-							fill="#eeeeee" stroke="#333333" stroke-width="2"/>
-						<line x1="80" y1="65" x2="95" y2="75" stroke="#333333" stroke-width="3" stroke-linecap="round"/>
-						<line x1="120" y1="65" x2="105" y2="75" stroke="#333333" stroke-width="3" stroke-linecap="round"/>
-						<circle cx="85" cy="80" r="5" fill="#333333"/>
-						<circle cx="115" cy="80" r="5" fill="#333333"/>
+					<!-- Neutral Pixel Slime -->
+					<svg id="svg-neutral" class="ghost-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+						<!-- Base Body -->
+						<rect x="5" y="4" width="6" height="1" fill="#FFC107"/>
+						<rect x="3" y="5" width="10" height="1" fill="#FFC107"/>
+						<rect x="2" y="6" width="12" height="1" fill="#FFC107"/>
+						<rect x="1" y="7" width="14" height="5" fill="#FFC107"/>
+						
+						<!-- Shadows (Bottom part) -->
+						<rect x="1" y="12" width="14" height="1" fill="#FFA000"/>
+						<rect x="2" y="13" width="12" height="1" fill="#FFA000"/>
+						<rect x="4" y="14" width="8" height="1" fill="#FFA000"/>
+
+						<!-- Highlights -->
+						<rect x="4" y="5" width="3" height="1" fill="#FFE082"/>
+						<rect x="3" y="6" width="2" height="1" fill="#FFE082"/>
+						<rect x="2" y="7" width="1" height="2" fill="#FFE082"/>
+
+						<!-- Neutral Eyes -->
+						<g class="part-blink" style="transform-origin: center; transform-box: fill-box;">
+							<rect x="4" y="9" width="2" height="1" fill="#111"/>
+							<rect x="10" y="9" width="2" height="1" fill="#111"/>
+						</g>
+						<!-- Mouth -->
+						<rect x="7" y="11" width="2" height="1" fill="#111"/>
+					</svg>
+
+					<!-- Sad/Hungry Pixel Slime -->
+					<svg id="svg-sad" class="ghost-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+						<!-- Base Body (Drooping slightly lower) -->
+						<rect x="5" y="6" width="6" height="1" fill="#F44336"/>
+						<rect x="4" y="7" width="8" height="1" fill="#F44336"/>
+						<rect x="3" y="8" width="10" height="1" fill="#F44336"/>
+						<rect x="2" y="9" width="12" height="1" fill="#F44336"/>
+						<rect x="1" y="10" width="14" height="3" fill="#F44336"/>
+
+						<!-- Shadows (Bottom spread out) -->
+						<rect x="0" y="13" width="16" height="1" fill="#C62828"/>
+						<rect x="1" y="14" width="14" height="1" fill="#C62828"/>
+						<rect x="3" y="15" width="10" height="1" fill="#C62828"/>
+
+						<!-- Highlights -->
+						<rect x="5" y="7" width="2" height="1" fill="#EF9A9A"/>
+						<rect x="4" y="8" width="1" height="2" fill="#EF9A9A"/>
+
+						<!-- Pleading Eyes -->
+						<g class="part-blink" style="transform-origin: center; transform-box: fill-box;">
+							<rect x="3" y="10" width="2" height="2" fill="#111"/>
+							<rect x="11" y="10" width="2" height="2" fill="#111"/>
+							<!-- Eye shines -->
+							<rect x="4" y="10" width="1" height="1" fill="#FFF"/>
+							<rect x="12" y="10" width="1" height="1" fill="#FFF"/>
+							<rect x="3" y="11" width="1" height="1" fill="#FFF"/> 
+							<rect x="11" y="11" width="1" height="1" fill="#FFF"/>
+						</g>
+
 						<!-- Sad mouth -->
-						<path d="M 90,110 Q 100,95 110,110" fill="none" stroke="#333333" stroke-width="3" stroke-linecap="round"/>
-						<!-- Tear -->
-						<path d="M 75,95 Q 75,105 80,105 Q 85,105 85,95 L 80,85 Z" fill="#64B5F6"/>
+						<g class="part-mouth" style="transform-origin: center; transform-box: fill-box;">
+							<rect x="7" y="11" width="2" height="1" fill="#111"/>
+							<rect x="6" y="12" width="1" height="1" fill="#111"/>
+							<rect x="9" y="12" width="1" height="1" fill="#111"/>
+						</g>
 					</svg>
 
-					<!-- Tombstone -->
-					<svg id="svg-dead" class="tombstone-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-						<!-- Base -->
-						<rect x="40" y="160" width="120" height="20" fill="#757575" stroke="#333333" stroke-width="2"/>
-						<!-- Stone -->
-						<path d="M 60,160 L 60,80 Q 60,30 100,30 Q 140,30 140,80 L 140,160 Z" fill="#9E9E9E" stroke="#333333" stroke-width="2"/>
-						<!-- Cross -->
-						<rect x="95" y="60" width="10" height="40" fill="#424242"/>
-						<rect x="85" y="75" width="30" height="10" fill="#424242"/>
-						<!-- Text "R.I.P." -->
-						<text x="100" y="140" font-family="sans-serif" font-size="20" font-weight="bold" fill="#424242" text-anchor="middle">R.I.P.</text>
+					<!-- Dead Puddle Pixel Slime -->
+					<svg id="svg-dead" class="tombstone-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+
+						<!-- Melted Body -->
+						<rect x="4" y="11" width="8" height="1" fill="#9E9E9E"/>
+						<rect x="2" y="12" width="12" height="1" fill="#9E9E9E"/>
+						<rect x="1" y="13" width="14" height="1" fill="#9E9E9E"/>
+						<rect x="0" y="14" width="16" height="2" fill="#9E9E9E"/>
+						<!-- Highlight -->
+						<rect x="4" y="12" width="2" height="1" fill="#E0E0E0"/>
+						<rect x="7" y="13" width="3" height="1" fill="#E0E0E0"/>
+						<!-- Dead Eyes (X X) -->
+						<rect x="4" y="13" width="1" height="1" fill="#000"/><rect x="6" y="13" width="1" height="1" fill="#000"/><rect x="5" y="14" width="1" height="1" fill="#000"/>
+						<rect x="10" y="13" width="1" height="1" fill="#000"/><rect x="12" y="13" width="1" height="1" fill="#000"/><rect x="11" y="14" width="1" height="1" fill="#000"/>
 					</svg>
 				</div>
 				<h2>pushie</h2>
 				<div class="progress-container">
 					<div class="progress-bar"></div>
 				</div>
-				<p class="info-text">Commits today: <span id="commit-count">Loading...</span></p>
+				<p class="info-text">Commits this week: <span id="commit-count">Loading...</span></p>
+				<div style="display:flex; gap: 10px; margin-top: 15px;">
+					<button class="refresh-btn" style="margin-top: 0;" id="refresh-btn">🔄 Refresh</button>
+					<button class="refresh-btn" style="margin-top: 0; background-color: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground);" id="debug-btn">🐛 Debug</button>
+				</div>
 
 				<script>
 					window.addEventListener('message', event => {
@@ -238,29 +442,52 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 							
 							// Reset SVGs
 							document.querySelectorAll('.ghost-svg, .tombstone-svg').forEach(svg => svg.classList.remove('active'));
-							container.classList.remove('dead');
+							container.className = 'ghost-container'; // Wipe dynamic classes
 							bubble.style.opacity = '1';
 							
 							// States logic
 							if (percentage === 0) {
 								progressBar.style.backgroundColor = '#424242'; // Grey
 								document.getElementById('svg-dead').classList.add('active');
-								container.classList.add('dead'); // Stop floating
-								bubble.textContent = "Je suis mort d'ennui... 💀";
+								container.classList.add('anim-dead');
+								bubble.textContent = "J'ai fondu d'ennui... 💀";
 							} else if (percentage < 30) {
 								progressBar.style.backgroundColor = '#F44336'; // Red
 								document.getElementById('svg-sad').classList.add('active');
-								bubble.textContent = "Commit... s'il te plaît ! J'ai faim 😭";
-							} else if (percentage <= 70) {
+								container.classList.add('anim-sad');
+								bubble.textContent = "Commit s'il te plaît... J'ai faim ! 😭";
+							} else if (percentage < 50) {
 								progressBar.style.backgroundColor = '#FFC107'; // Yellow
 								document.getElementById('svg-neutral').classList.add('active');
+								container.classList.add('anim-neutral');
 								bubble.textContent = "Un petit push me ferait du bien... 😐";
+							} else if (percentage < 80) {
+								progressBar.style.backgroundColor = '#29B6F6'; // Light Blue
+								document.getElementById('svg-good').classList.add('active');
+								container.classList.add('anim-happy');
+								bubble.textContent = "Beau travail ! Je suis en pleine forme ! ✨";
 							} else {
-								progressBar.style.backgroundColor = '#4CAF50'; // Green
-								document.getElementById('svg-normal').classList.add('active');
-								bubble.textContent = "Quel code magnifique ! Je vaux 1 million de dollars 💸😎";
+								progressBar.style.backgroundColor = '#00E676'; // Bright Green
+								document.getElementById('svg-epic').classList.add('active');
+								container.classList.add('anim-epic');
+								bubble.textContent = "Quel code magnifique, on va devenir riche ensemble ! 💸😎";
 							}
 						}
+					});
+
+					document.getElementById('refresh-btn').addEventListener('click', () => {
+						const bubble = document.getElementById('speech-bubble');
+						document.getElementById('commit-count').textContent = 'Loading...';
+						bubble.textContent = "Checking GitHub...";
+						const vscode = acquireVsCodeApi();
+						vscode.postMessage({ type: 'refresh' });
+					});
+
+					let debugVisuelIndex = 0;
+					const debugValues = [0, 2, 4, 7, 10]; // 0%, 20%, 40%, 70%, 100%
+					document.getElementById('debug-btn').addEventListener('click', () => {
+						debugVisuelIndex = (debugVisuelIndex + 1) % debugValues.length;
+						window.postMessage({ type: 'updateCommitCount', value: debugValues[debugVisuelIndex] });
 					});
 				</script>
 			</body>
