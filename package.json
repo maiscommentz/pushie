@@ -3,6 +3,7 @@
   "displayName": "pushie",
   "description": "Meet pushie, the virtual pet living in your repositories. Keep him alive by pushing code, watch him evolve with your PRs, and get roasted by his AI for messy commit messages. ",
   "version": "0.0.1",
+  "icon": "media/icon.png",
   "engines": {
     "vscode": "^1.109.0"
   },
@@ -16,8 +17,8 @@
       "activitybar": [
         {
           "id": "pushie-explorer",
-          "title": "Pushie",
-          "icon": "$(smiley)"
+          "title": "pushie",
+          "icon": "media/pushie-activity.svg"
         }
       ]
     },
@@ -26,7 +27,7 @@
         {
           "type": "webview",
           "id": "pushie.dashboard",
-          "name": "pushie dashboard"
+          "name": "dashboard"
         }
       ]
     },

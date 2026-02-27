@@ -89,7 +89,7 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 			<head>
 				<meta charset="UTF-8">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<title>Pushie Dashboard</title>
+				<title>Dashboard</title>
 				<style>
 					body {
 						display: flex;
@@ -250,10 +250,10 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 					<!-- Epic Pixel Slime (1M Dollar) -->
 					<svg id="svg-epic" class="ghost-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
 						<!-- Base Body -->
-						<rect x="5" y="4" width="6" height="1" fill="#00E676"/>
-						<rect x="3" y="5" width="10" height="1" fill="#00E676"/>
-						<rect x="2" y="6" width="12" height="1" fill="#00E676"/>
-						<rect x="1" y="7" width="14" height="5" fill="#00E676"/>
+						<rect x="5" y="3" width="6" height="1" fill="#00E676"/>
+						<rect x="3" y="4" width="10" height="1" fill="#00E676"/>
+						<rect x="2" y="5" width="12" height="1" fill="#00E676"/>
+						<rect x="1" y="6" width="14" height="6" fill="#00E676"/>
 						
 						<!-- Shadows (Bottom part) -->
 						<rect x="1" y="12" width="14" height="1" fill="#00C853"/>
@@ -261,9 +261,9 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 						<rect x="4" y="14" width="8" height="1" fill="#00C853"/>
 
 						<!-- Highlights -->
-						<rect x="4" y="5" width="3" height="1" fill="#69F0AE"/>
-						<rect x="3" y="6" width="2" height="1" fill="#69F0AE"/>
-						<rect x="2" y="7" width="1" height="2" fill="#69F0AE"/>
+						<rect x="4" y="4" width="3" height="1" fill="#69F0AE"/>
+						<rect x="3" y="5" width="2" height="1" fill="#69F0AE"/>
+						<rect x="2" y="6" width="1" height="3" fill="#69F0AE"/>
 
 						<!-- Deal With It Sunglasses -->
 						<g class="part-blink" style="transform-origin: center; transform-box: fill-box;">
@@ -306,10 +306,10 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 					<!-- Good Pixel Slime (Normal Happy) -->
 					<svg id="svg-good" class="ghost-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
 						<!-- Base Body -->
-						<rect x="5" y="4" width="6" height="1" fill="#29B6F6"/>
-						<rect x="3" y="5" width="10" height="1" fill="#29B6F6"/>
-						<rect x="2" y="6" width="12" height="1" fill="#29B6F6"/>
-						<rect x="1" y="7" width="14" height="5" fill="#29B6F6"/>
+						<rect x="5" y="3" width="6" height="1" fill="#29B6F6"/>
+						<rect x="3" y="4" width="10" height="1" fill="#29B6F6"/>
+						<rect x="2" y="5" width="12" height="1" fill="#29B6F6"/>
+						<rect x="1" y="6" width="14" height="6" fill="#29B6F6"/>
 						
 						<!-- Shadows (Bottom part) -->
 						<rect x="1" y="12" width="14" height="1" fill="#0288D1"/>
@@ -317,9 +317,9 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 						<rect x="4" y="14" width="8" height="1" fill="#0288D1"/>
 
 						<!-- Highlights -->
-						<rect x="4" y="5" width="3" height="1" fill="#81D4FA"/>
-						<rect x="3" y="6" width="2" height="1" fill="#81D4FA"/>
-						<rect x="2" y="7" width="1" height="2" fill="#81D4FA"/>
+						<rect x="4" y="4" width="3" height="1" fill="#81D4FA"/>
+						<rect x="3" y="5" width="2" height="1" fill="#81D4FA"/>
+						<rect x="2" y="6" width="1" height="3" fill="#81D4FA"/>
 
 						<!-- Happy Eyes -->
 						<g class="part-blink" style="transform-origin: center; transform-box: fill-box;">
@@ -338,10 +338,10 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 					<!-- Neutral Pixel Slime -->
 					<svg id="svg-neutral" class="ghost-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
 						<!-- Base Body -->
-						<rect x="5" y="4" width="6" height="1" fill="#FFC107"/>
-						<rect x="3" y="5" width="10" height="1" fill="#FFC107"/>
-						<rect x="2" y="6" width="12" height="1" fill="#FFC107"/>
-						<rect x="1" y="7" width="14" height="5" fill="#FFC107"/>
+						<rect x="5" y="3" width="6" height="1" fill="#FFC107"/>
+						<rect x="3" y="4" width="10" height="1" fill="#FFC107"/>
+						<rect x="2" y="5" width="12" height="1" fill="#FFC107"/>
+						<rect x="1" y="6" width="14" height="6" fill="#FFC107"/>
 						
 						<!-- Shadows (Bottom part) -->
 						<rect x="1" y="12" width="14" height="1" fill="#FFA000"/>
@@ -349,9 +349,9 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 						<rect x="4" y="14" width="8" height="1" fill="#FFA000"/>
 
 						<!-- Highlights -->
-						<rect x="4" y="5" width="3" height="1" fill="#FFE082"/>
-						<rect x="3" y="6" width="2" height="1" fill="#FFE082"/>
-						<rect x="2" y="7" width="1" height="2" fill="#FFE082"/>
+						<rect x="4" y="4" width="3" height="1" fill="#FFE082"/>
+						<rect x="3" y="5" width="2" height="1" fill="#FFE082"/>
+						<rect x="2" y="6" width="1" height="3" fill="#FFE082"/>
 
 						<!-- Neutral Eyes -->
 						<g class="part-blink" style="transform-origin: center; transform-box: fill-box;">
@@ -365,11 +365,11 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 					<!-- Sad/Hungry Pixel Slime -->
 					<svg id="svg-sad" class="ghost-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
 						<!-- Base Body (Drooping slightly lower) -->
-						<rect x="5" y="6" width="6" height="1" fill="#F44336"/>
-						<rect x="4" y="7" width="8" height="1" fill="#F44336"/>
-						<rect x="3" y="8" width="10" height="1" fill="#F44336"/>
-						<rect x="2" y="9" width="12" height="1" fill="#F44336"/>
-						<rect x="1" y="10" width="14" height="3" fill="#F44336"/>
+						<rect x="5" y="5" width="6" height="1" fill="#F44336"/>
+						<rect x="4" y="6" width="8" height="1" fill="#F44336"/>
+						<rect x="3" y="7" width="10" height="1" fill="#F44336"/>
+						<rect x="2" y="8" width="12" height="1" fill="#F44336"/>
+						<rect x="1" y="9" width="14" height="4" fill="#F44336"/>
 
 						<!-- Shadows (Bottom spread out) -->
 						<rect x="0" y="13" width="16" height="1" fill="#C62828"/>
@@ -377,8 +377,8 @@ export class PushieProvider implements vscode.WebviewViewProvider {
 						<rect x="3" y="15" width="10" height="1" fill="#C62828"/>
 
 						<!-- Highlights -->
-						<rect x="5" y="7" width="2" height="1" fill="#EF9A9A"/>
-						<rect x="4" y="8" width="1" height="2" fill="#EF9A9A"/>
+						<rect x="5" y="6" width="2" height="1" fill="#EF9A9A"/>
+						<rect x="4" y="7" width="1" height="2" fill="#EF9A9A"/>
 
 						<!-- Pleading Eyes -->
 						<g class="part-blink" style="transform-origin: center; transform-box: fill-box;">
