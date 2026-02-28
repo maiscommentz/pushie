@@ -370,19 +370,19 @@ export function getDashboardHtml(): string {
 							if (svgDead) svgDead.classList.add('active');
 							if (container) container.classList.add('anim-dead');
 							if (bubble) bubble.textContent = "I melted from boredom... 💀";
-						} else if (percentage < 30) {
+						} else if (percentage < 50) {
 							if (progressBar) progressBar.style.backgroundColor = '#F44336'; // Red
 							const svgSad = document.getElementById('svg-sad');
 							if (svgSad) svgSad.classList.add('active');
 							if (container) container.classList.add('anim-sad');
 							if (bubble) bubble.textContent = "Commit please... I'm hungry! 😭";
-						} else if (percentage < 50) {
+						} else if (percentage < 80) {
 							if (progressBar) progressBar.style.backgroundColor = '#FFC107'; // Yellow
 							const svgNeutral = document.getElementById('svg-neutral');
 							if (svgNeutral) svgNeutral.classList.add('active');
 							if (container) container.classList.add('anim-neutral');
 							if (bubble) bubble.textContent = "A little push would do me good... 😐";
-						} else if (percentage < 80) {
+						} else if (percentage < 100) {
 							if (progressBar) progressBar.style.backgroundColor = '#29B6F6'; // Light Blue
 							const svgGood = document.getElementById('svg-good');
 							if (svgGood) svgGood.classList.add('active');

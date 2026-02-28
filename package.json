@@ -3,7 +3,7 @@
   "displayName": "pushie - another code companion",
   "publisher": "maiscommentz",
   "description": "Meet pushie, the virtual pet living in your repositories. Keep him alive by pushing code and get roasted by his AI for messy code.",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "icon": "media/icon.png",
   "engines": {
     "vscode": "^1.109.0"
