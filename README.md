@@ -4,6 +4,8 @@ Meet **pushie**, your cute little coding buddy who lives right inside your VS Co
 
 pushie isn't just a pretty face... he's got a brain! Thanks to the power of AI, pushie can now roast your code with a personality as unique as your coding style... (he forced me to write this)
 
+🌐 Access the extension page online: https://marketplace.visualstudio.com/items?itemName=maiscommentz.pushie
+
 ## 🛠️ Technologies
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
 ![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)

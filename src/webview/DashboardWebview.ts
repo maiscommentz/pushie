@@ -1,5 +1,5 @@
 export function getDashboardHtml(): string {
-    return `<!DOCTYPE html>
+	return `<!DOCTYPE html>
 		<html lang="en">
 		<head>
 			<meta charset="UTF-8">
@@ -350,8 +350,8 @@ export function getDashboardHtml(): string {
 							commitCountElement.textContent = commitCount.toString();
 						}
 						
-						// Each commit gives 8% food
-						const percentage = Math.min(100, commitCount * 8);
+						// Each commit gives 4% food
+						const percentage = Math.min(100, commitCount * 4);
 						const progressBar = document.querySelector('.progress-bar');
 						const container = document.getElementById('avatar-container');
 						const bubble = document.getElementById('speech-bubble');
