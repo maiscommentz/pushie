@@ -1,13 +1,16 @@
 {
   "name": "pushie",
-  "displayName": "pushie",
-  "description": "Meet pushie, the virtual pet living in your repositories. Keep him alive by pushing code, watch him evolve with your PRs, and get roasted by his AI for messy commit messages. ",
+  "displayName": "pushie - another sarcastic code companion",
+  "publisher": "maiscommentz",
+  "description": "Meet pushie, the virtual pet living in your repositories. Keep him alive by pushing code and get roasted by his AI for messy code.",
   "version": "0.0.1",
   "icon": "media/icon.png",
   "engines": {
     "vscode": "^1.109.0"
   },
   "categories": [
+    "AI",
+    "Visualization",
     "Other"
   ],
   "activationEvents": [],
@@ -31,16 +34,11 @@
         {
           "type": "webview",
           "id": "pushie.dashboard",
-          "name": "dashboard"
+          "name": "dashboard",
+          "icon": "media/pushie-activity.svg"
         }
       ]
     },
-    "commands": [
-      {
-        "command": "pushie.helloWorld",
-        "title": "Hello World"
-      }
-    ],
     "configuration": {
       "title": "pushie",
       "properties": {
@@ -53,7 +51,7 @@
           "default": "OpenAI",
           "description": "Select your AI Provider."
         },
-        "pushie.openaiApiKey": {
+        "pushie.apiKey": {
           "type": "string",
           "default": "",
           "description": "API Key for your selected AI Provider."
@@ -61,7 +59,7 @@
         "pushie.apiModel": {
           "type": "string",
           "default": "gpt-4o-mini",
-          "description": "The model to use. E.g., 'gpt-4o-mini' for OpenAI, 'llama3-8b-8192' for Groq, or 'local-model' for LM Studio."
+          "description": "The model to use. E.g., 'gpt-4o-mini' for OpenAI, 'llama-3.3-70b-versatile' for Groq, or 'local-model' for LM Studio."
         }
       }
     }
