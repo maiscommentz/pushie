@@ -1,13 +1,16 @@
 {
   "name": "pushie",
-  "displayName": "pushie",
-  "description": "Meet pushie, the virtual pet living in your repositories. Keep him alive by pushing code, watch him evolve with your PRs, and get roasted by his AI for messy commit messages. ",
+  "displayName": "pushie - another sarcastic code companion",
+  "publisher": "maiscommentz",
+  "description": "Meet pushie, the virtual pet living in your repositories. Keep him alive by pushing code and get roasted by his AI for messy code.",
   "version": "0.0.1",
   "icon": "media/icon.png",
   "engines": {
     "vscode": "^1.109.0"
   },
   "categories": [
+    "AI",
+    "Visualization",
     "Other"
   ],
   "activationEvents": [],
