@@ -31,16 +31,11 @@
         {
           "type": "webview",
           "id": "pushie.dashboard",
-          "name": "dashboard"
+          "name": "dashboard",
+          "icon": "media/pushie-activity.svg"
         }
       ]
     },
-    "commands": [
-      {
-        "command": "pushie.helloWorld",
-        "title": "Hello World"
-      }
-    ],
     "configuration": {
       "title": "pushie",
       "properties": {
@@ -53,7 +48,7 @@
           "default": "OpenAI",
           "description": "Select your AI Provider."
         },
-        "pushie.openaiApiKey": {
+        "pushie.apiKey": {
           "type": "string",
           "default": "",
           "description": "API Key for your selected AI Provider."
@@ -61,7 +56,7 @@
         "pushie.apiModel": {
           "type": "string",
           "default": "gpt-4o-mini",
-          "description": "The model to use. E.g., 'gpt-4o-mini' for OpenAI, 'llama3-8b-8192' for Groq, or 'local-model' for LM Studio."
+          "description": "The model to use. E.g., 'gpt-4o-mini' for OpenAI, 'llama-3.3-70b-versatile' for Groq, or 'local-model' for LM Studio."
         }
       }
     }

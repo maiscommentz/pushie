@@ -1,9 +1,15 @@
-import * as vscode from 'vscode';
-
 export interface RoastRequest {
     selectedText: string;
     apiKey: string;
     apiModel: string;
+}
+
+interface OpenAIResponse {
+    choices?: {
+        message?: {
+            content?: string;
+        };
+    }[];
 }
 
 export abstract class AIProvider {
@@ -25,70 +31,65 @@ ${selectedText}
 
 pushie, give me your 15-word verdict.`;
     }
+
+    protected async fetchOpenAICompatible(
+        apiUrl: string,
+        model: string,
+        apiKey: string,
+        prompt: string,
+        providerName: string
+    ): Promise<string> {
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json'
+        };
+
+        if (apiKey) {
+            headers['Authorization'] = `Bearer ${apiKey}`;
+        } else if (providerName === 'Groq') {
+            throw new Error(`Invalid ${providerName} API Key. I can't roast without valid credentials.`);
+        }
+
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+                model,
+                messages: [{ role: 'user', content: prompt }],
+                max_tokens: 50
+            })
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            console.error(`Error roasting code with ${providerName} (HTTP ${response.status}):`, errorBody);
+
+            if (response.status === 429) {
+                throw new Error("I'm broke! My AI brain ran out of API credits. 💸 (or maybe there is no payment method linked to your account?)");
+            }
+            if (response.status === 401 && providerName === 'Groq') {
+                throw new Error(`Invalid ${providerName} API Key. I can't roast without valid credentials.`);
+            }
+            throw new Error(`${providerName} API Error ${response.status}`);
+        }
+
+        const data = await response.json() as OpenAIResponse;
+        return data?.choices?.[0]?.message?.content || "Words fail me. It's that bad.";
+    }
 }
 
 export class OpenAICompatibleProvider extends AIProvider {
     async roastCode(request: RoastRequest): Promise<string> {
         const prompt = this.getPrompt(request.selectedText);
         const apiUrl = "https://api.openai.com/v1/chat/completions";
-
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                ...(request.apiKey ? { 'Authorization': `Bearer ${request.apiKey}` } : {})
-            },
-            body: JSON.stringify({
-                model: request.apiModel,
-                messages: [{ role: 'user', content: prompt }],
-                max_tokens: 50
-            })
-        });
-
-        if (!response.ok) {
-            const errorBody = await response.text();
-            console.error(`Error roasting code (HTTP ${response.status}):`, errorBody);
-
-            if (response.status === 429) {
-                throw new Error("I'm broke! My AI brain ran out of API credits. 💸 (or maybe there is no payment method linked to your account?)");
-            }
-            throw new Error(`API Error ${response.status}`);
-        }
-
-        const data = await response.json() as any;
-        return data?.choices?.[0]?.message?.content || "Words fail me. It's that bad.";
+        return this.fetchOpenAICompatible(apiUrl, request.apiModel, request.apiKey, prompt, 'OpenAI');
     }
 }
 
 export class GroqProvider extends AIProvider {
     async roastCode(request: RoastRequest): Promise<string> {
         const prompt = this.getPrompt(request.selectedText);
-        const apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
-
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${request.apiKey}`
-            },
-            body: JSON.stringify({
-                model: request.apiModel,
-                messages: [{ role: 'user', content: prompt }],
-                max_tokens: 50
-            })
-        });
-
-        if (!response.ok) {
-            const errorBody = await response.text();
-            console.error(`Error roasting code with Groq (HTTP ${response.status}):`, errorBody);
-            if (response.status === 401) {
-                throw new Error("Invalid Groq API Key. I can't roast without valid credentials.");
-            }
-            throw new Error(`Groq API Error ${response.status}`);
-        }
-
-        const data = await response.json() as any;
-        return data?.choices?.[0]?.message?.content || "Words fail me. It's that bad.";
+        const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
+        return this.fetchOpenAICompatible(apiUrl, request.apiModel, request.apiKey, prompt, 'Groq');
     }
 }
 
